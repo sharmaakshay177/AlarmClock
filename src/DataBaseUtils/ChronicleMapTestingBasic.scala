@@ -27,10 +27,11 @@ object ChronicleMapUtil {
                                  chronicleMap: ChronicleMap[Key, Val]):Unit ={
     chronicleMap.put(key, value)
   }
-  //TODO = Update the method with Either condition
+
   def getRecordFromMap[Key, Val](key: Key,
-                                 chronicleMap: ChronicleMap[Key, Val]): Val ={
-    chronicleMap.get(key)
+                                 chronicleMap: ChronicleMap[Key, Val]): Option[Val] ={
+    if(chronicleMap.containsKey(key)) Some(chronicleMap.get(key))
+    else None
   }
 
 }
@@ -74,7 +75,11 @@ object ChronicleMapTestingBasic extends App{
       None),
     mapFromBuilder)
 
-  val getRecord = getRecordFromMap("29:10:2020",mapFromBuilder)
+  val getRecord = {
+    getRecordFromMap("29:10:2020",mapFromBuilder) match {
+      case Some(item: AlarmItemSetting) => item
+    }
+  }
 
   println(getRecord)
 
