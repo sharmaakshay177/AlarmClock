@@ -19,15 +19,23 @@ object PlayAlarm {
 
   def playAlarm(duration: Int, threadPlayer: Thread):Unit ={
     // duration will be taken in minutes
-    var checkTimer = true
     val deadline = duration.minutes.fromNow
-    while(checkTimer){
-        threadPlayer.start()
-        while(deadline.hasTimeLeft()){}
-        checkTimer = false
-        threadPlayer.stop()
-    }
+
+    threadPlayer.start()
+    while(deadline.hasTimeLeft()){}
+    threadPlayer.stop()
   }
+
+  // 1 min = 60,000 millis
+  def minuteToMillis(minute: Int): Int = minute * 60000
+
+  //TODO = add interrupt variable also so that it can stop check for passing an interruption in a thread
+  def snoozeTimerAlarmPlay(snoozeTime: Int, duration: Int, thread: Thread, fun:(Int, Thread) => Unit): Unit ={
+    fun(duration, thread)
+    Thread.sleep(minuteToMillis(snoozeTime))
+  }
+
+
   def createAlarmString(min: Int, hour: Int): String = getTimeString(min.toString, hour.toString)
 
 }
