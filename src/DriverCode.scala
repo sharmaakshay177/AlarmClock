@@ -32,7 +32,7 @@ object DriverCode extends App {
 
   val chronicleMap = createChronicMapFromBuilder(chronicleMapBuilder)
 
-  val alarmItem1 = AlarmItemSetting("13:29",
+  val alarmItem1 = AlarmItemSetting("22:32",
                                     Some("Born-To-Shine.wav"),
                                     5,
                                     "Testing alarm 1",
@@ -44,34 +44,41 @@ object DriverCode extends App {
                                     None)
 
   logger.info("putting in both the objects into the map")
-  enterRecordInMap("13:29",alarmItem1,chronicleMap)
+  enterRecordInMap("22:32",alarmItem1,chronicleMap)
   enterRecordInMap("13:27",alarmItem2,chronicleMap)
 
   val alarmTimeList = List("22:55","22:51","22:53","23:09","23:29",
-                           "13:29","13:27")
+                           "22:32","13:27")
 
   //TODO = Add a scheduler or a better condition handler here
   val alwaysRun = true
   while(alwaysRun){
     logger.info(s"time now is $time")
     if(alarmTimeList.contains(time)){
-      logger.info("getting record back at the match and getting songName")
-      val songName = {
-        val record = {
-          getRecordFromMap(time, chronicleMap) match {
-            case Some(item: AlarmItemSetting) => item
-          }
-        }
-        record.ringTone match {
+      logger.info(s"Time condition met and time now is $time")
+      logger.info("getting record back at the time match")
+
+      val alarmItem = getRecordFromMap(time, chronicleMap) match {
+        case Some(item: AlarmItemSetting) => item
+      }
+      logger.info(s"alarm item retrieved is $alarmItem")
+      val songName ={
+        alarmItem.ringTone match {
           case Some(name: String) => name
-          case None => "No Song Found"
+          case None => DefaultAlarmTone
         }
       }
-      logger.info(s"Time condition met and time now is $time")
+      val alarmLabel = alarmItem.label
+      val snoozeTimer = alarmItem.snoozeTime
+
       val player = new Thread(new ThreadPlayer(songName))
+
       logger.info("playing alarm")
+      println(alarmLabel)
+      println("press 1 to stop alarm")
       playAlarm(1, player)
-      logger.info("Alarm Done for 1 minute and now stopped")
+      logger.info("Alarm player of 1 min and now stopping")
+
     }else{
       logger.info("Putting thread to sleep for 10 sec")
       Thread.sleep(10000)
